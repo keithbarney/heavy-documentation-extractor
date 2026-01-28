@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      color: #333;
+      background: #fff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .filename {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 11px;
+      color: #666;
+      background: #f5f5f5;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .preview {
+      flex: 1;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 12px;
+      overflow-y: auto;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .preview.error {
+      color: #d32f2f;
+      background: #fff5f5;
+      border-color: #ffcdd2;
+    }
+
+    .preview.empty {
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #333;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #000;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e5e5e5;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      margin-top: 8px;
+      min-height: 16px;
+    }
+
+    .status.success {
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Heavy Documentation Extractor</h1>
+    <span class="filename" id="filename">—</span>
+  </div>
+
+  <div class="preview empty" id="preview">Select a section and run the plugin</div>
+
+  <div class="actions">
+    <button class="btn-secondary" id="refresh">Refresh</button>
+    <button class="btn-secondary" id="copy" disabled>Copy</button>
+    <button class="btn-primary" id="download" disabled>Download</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <script>
+    let currentContent = '';
+    let currentFilename = 'section.md';
+
+    const preview = document.getElementById('preview');
+    const filename = document.getElementById('filename');
+    const copyBtn = document.getElementById('copy');
+    const downloadBtn = document.getElementById('download');
+    const refreshBtn = document.getElementById('refresh');
+    const status = document.getElementById('status');
+
+    // Handle messages from plugin code
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+
+      if (msg.type === 'markdown') {
+        currentContent = msg.content;
+        currentFilename = msg.filename;
+
+        preview.textContent = currentContent;
+        preview.classList.remove('error', 'empty');
+        filename.textContent = currentFilename;
+
+        copyBtn.disabled = false;
+        downloadBtn.disabled = false;
+        status.textContent = '';
+      }
+
+      if (msg.type === 'error') {
+        preview.textContent = msg.message;
+        preview.classList.add('error');
+        preview.classList.remove('empty');
+        filename.textContent = '—';
+
+        copyBtn.disabled = true;
+        downloadBtn.disabled = true;
+        status.textContent = '';
+      }
+    };
+
+    // Copy to clipboard using textarea fallback (clipboard API doesn't work in Figma iframes)
+    copyBtn.addEventListener('click', () => {
+      const textarea = document.createElement('textarea');
+      textarea.value = currentContent;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        status.textContent = 'Copied to clipboard';
+        status.classList.add('success');
+        setTimeout(() => {
+          status.textContent = '';
+          status.classList.remove('success');
+        }, 2000);
+      } catch (err) {
+        status.textContent = 'Failed to copy';
+      }
+
+      document.body.removeChild(textarea);
+    });
+
+    // Download file
+    downloadBtn.addEventListener('click', () => {
+      const blob = new Blob([currentContent], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentFilename;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      status.textContent = 'Downloaded ' + currentFilename;
+      status.classList.add('success');
+      setTimeout(() => {
+        status.textContent = '';
+        status.classList.remove('success');
+      }, 2000);
+    });
+
+    // Refresh
+    refreshBtn.addEventListener('click', () => {
+      parent.postMessage({ pluginMessage: { type: 'extract' } }, '*');
+    });
+  </script>
+</body>
+</html>
