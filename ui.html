@@ -127,7 +127,7 @@
     <span class="filename" id="filename">—</span>
   </div>
 
-  <div class="preview empty" id="preview">Select a section and run the plugin</div>
+  <div class="preview empty" id="preview">Select a Figma Section</div>
 
   <div class="actions">
     <button class="btn-secondary" id="refresh">Refresh</button>
@@ -167,8 +167,8 @@
 
       if (msg.type === 'error') {
         preview.textContent = msg.message;
-        preview.classList.add('error');
-        preview.classList.remove('empty');
+        preview.classList.add('empty');
+        preview.classList.remove('error');
         filename.textContent = '—';
 
         copyBtn.disabled = true;

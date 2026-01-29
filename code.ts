@@ -33,12 +33,13 @@ function isDecorativeNode(node: SceneNode): boolean {
 }
 
 // Extract variant properties from a component instance
-function getComponentMetadata(node: InstanceNode): string {
+async function getComponentMetadata(node: InstanceNode): Promise<string> {
   var name = node.name || 'Unknown';
 
-  // Get the main component name if available
-  if (node.mainComponent) {
-    var mainName = node.mainComponent.name;
+  // Get the main component name if available (async for dynamic-page access)
+  var mainComponent = await node.getMainComponentAsync();
+  if (mainComponent) {
+    var mainName = mainComponent.name;
     if (mainName) {
       name = mainName;
     }
@@ -64,7 +65,7 @@ function getComponentMetadata(node: InstanceNode): string {
 }
 
 // Recursively extract markdown, preserving parent-child relationships
-function extractMarkdownFromNode(node: SceneNode, depth: number): string[] {
+async function extractMarkdownFromNode(node: SceneNode, depth: number): Promise<string[]> {
   var lines: string[] = [];
 
   // Skip decorative nodes entirely
@@ -74,7 +75,7 @@ function extractMarkdownFromNode(node: SceneNode, depth: number): string[] {
 
   // Handle component instances - capture metadata
   if (node.type === 'INSTANCE') {
-    var metadata = getComponentMetadata(node);
+    var metadata = await getComponentMetadata(node);
     lines.push(metadata);
     lines.push('');
 
@@ -90,7 +91,7 @@ function extractMarkdownFromNode(node: SceneNode, depth: number): string[] {
       });
 
       for (var i = 0; i < sortedChildren.length; i++) {
-        var childLines = extractMarkdownFromNode(sortedChildren[i], childDepth);
+        var childLines = await extractMarkdownFromNode(sortedChildren[i], childDepth);
         for (var j = 0; j < childLines.length; j++) {
           lines.push(childLines[j]);
         }
@@ -141,7 +142,7 @@ function extractMarkdownFromNode(node: SceneNode, depth: number): string[] {
     });
 
     for (var i = 0; i < sortedChildren.length; i++) {
-      var childLines = extractMarkdownFromNode(sortedChildren[i], childDepth);
+      var childLines = await extractMarkdownFromNode(sortedChildren[i], childDepth);
       for (var j = 0; j < childLines.length; j++) {
         lines.push(childLines[j]);
       }
@@ -154,7 +155,7 @@ function extractMarkdownFromNode(node: SceneNode, depth: number): string[] {
 // Main plugin logic
 figma.showUI(__html__, { width: 480, height: 400 });
 
-function extractMarkdown() {
+async function extractMarkdown() {
   var selection = figma.currentPage.selection;
 
   if (selection.length === 0) {
@@ -170,7 +171,7 @@ function extractMarkdown() {
   }
 
   // Start at depth 0 for the selected section
-  var lines = extractMarkdownFromNode(section, 0);
+  var lines = await extractMarkdownFromNode(section, 0);
 
   if (lines.length === 0) {
     figma.ui.postMessage({ type: 'error', message: 'No content found in section' });
