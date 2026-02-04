@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Extract text from Figma sections to markdown with preserved hierarchy",
   "scripts": {
-    "dev": "esbuild code.ts --bundle --target=es6 --outfile=dist/code.js --watch",
-    "build": "esbuild code.ts --bundle --target=es6 --outfile=dist/code.js --minify",
+    "build:ui": "node build-ui.js",
+    "build:code": "esbuild code.ts --bundle --target=es6 --outfile=dist/code.js --minify",
+    "build": "npm run build:ui && npm run build:code",
+    "dev:code": "esbuild code.ts --bundle --target=es6 --outfile=dist/code.js --watch",
+    "dev": "npm run build:ui && npm run dev:code",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
