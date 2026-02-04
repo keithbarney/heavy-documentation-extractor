@@ -16,9 +16,15 @@ Figma plugin that extracts text from a selected section and converts it to Markd
 ## Build
 
 ```bash
-npm run build    # Compile TypeScript
-npm run watch    # Watch mode
+npm install      # Install dependencies
+npm run dev      # Watch mode (esbuild)
+npm run build    # Production build (minified)
+npm run typecheck # Type checking
 ```
+
+## Build Target
+
+esbuild uses `--target=es6` because Figma's plugin sandbox doesn't support ES2020+ syntax (e.g., `??`, `?.`). Write modern TypeScript freely — esbuild transpiles it down automatically.
 
 ## How It Works
 
