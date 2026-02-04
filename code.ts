@@ -10,7 +10,7 @@ var SKIP_FRAME_NAMES = [
 function isDecorativeFrame(name: string): boolean {
   var lower = name.toLowerCase().trim();
   for (var i = 0; i < SKIP_FRAME_NAMES.length; i++) {
-    if (lower === SKIP_FRAME_NAMES[i] || lower.indexOf(SKIP_FRAME_NAMES[i]) === 0) {
+    if (lower === SKIP_FRAME_NAMES[i]) {
       return true;
     }
   }
@@ -163,23 +163,35 @@ async function extractMarkdown() {
     return;
   }
 
-  var section = selection.find(function(node) { return node.type === 'SECTION'; });
+  var sections = selection.filter(function(node) { return node.type === 'SECTION'; });
 
-  if (!section) {
+  if (sections.length === 0) {
     figma.ui.postMessage({ type: 'error', message: 'Selection must include a Section' });
     return;
   }
 
-  // Start at depth 0 for the selected section
-  var lines = await extractMarkdownFromNode(section, 0);
+  // Extract from all selected sections
+  var allLines: string[] = [];
+  for (var s = 0; s < sections.length; s++) {
+    var sectionLines = await extractMarkdownFromNode(sections[s], 0);
+    for (var k = 0; k < sectionLines.length; k++) {
+      allLines.push(sectionLines[k]);
+    }
+    // Add a blank line between sections
+    if (s < sections.length - 1 && sectionLines.length > 0) {
+      allLines.push('');
+    }
+  }
 
-  if (lines.length === 0) {
-    figma.ui.postMessage({ type: 'error', message: 'No content found in section' });
+  if (allLines.length === 0) {
+    figma.ui.postMessage({ type: 'error', message: 'No content found in selected sections' });
     return;
   }
 
-  var markdown = lines.join('\n').trim();
-  var sectionName = section.name || 'section';
+  var markdown = allLines.join('\n').trim();
+  var sectionName = sections.length === 1
+    ? (sections[0].name || 'section')
+    : 'sections';
 
   figma.ui.postMessage({
     type: 'markdown',

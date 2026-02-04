@@ -152,7 +152,7 @@
     window.onmessage = (event) => {
       const msg = event.data.pluginMessage;
 
-      if (msg.type === 'markdown') {
+      if (msg?.type === 'markdown') {
         currentContent = msg.content;
         currentFilename = msg.filename;
 
@@ -165,7 +165,7 @@
         status.textContent = '';
       }
 
-      if (msg.type === 'error') {
+      if (msg?.type === 'error') {
         preview.textContent = msg.message;
         preview.classList.add('empty');
         preview.classList.remove('error');
