@@ -27,6 +27,8 @@ npm run dev        # Build UI + watch mode for code
 npm run typecheck  # Type checking
 ```
 
+**Note:** `/commit-push-pr` auto-runs `npm run build` + `npm run typecheck` before staging. No need to build manually before committing.
+
 ## Build Target
 
 esbuild uses `--target=es6` because Figma's plugin sandbox doesn't support ES2020+ syntax (e.g., `??`, `?.`). Write modern TypeScript freely — esbuild transpiles it down automatically.

@@ -208,6 +208,9 @@ figma.ui.onmessage = function(msg) {
   if (msg.type === 'close') {
     figma.closePlugin();
   }
+  if (msg.type === 'open-url' && msg.url) {
+    figma.openExternal(msg.url);
+  }
 };
 
 // Run extraction on load
