@@ -3,33 +3,236 @@
 <head>
   <!-- HEAVY_THEME -->
   <style>
+    /* ── Layout ── */
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: var(--space-lg);
+      flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--color-text-strong);
+    }
+
+    .filename-badge {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 2px 8px;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── Format tabs ── */
+    .format-tabs {
+      display: flex;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-lg);
+      flex-shrink: 0;
+    }
+
+    .tab {
+      font-family: var(--font-secondary);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .tab:hover {
+      color: var(--color-text);
+      border-color: var(--color-border-focus);
+    }
+
+    .tab.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: var(--color-bg);
+    }
+
+    /* ── Preview pane ── */
+    .preview-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-bg);
+      margin-bottom: var(--space-lg);
+      position: relative;
     }
 
     .preview {
       font-size: 11px;
-      line-height: 1.6;
+      line-height: 1.65;
       white-space: pre-wrap;
       word-break: break-word;
+      padding: var(--space-lg);
+      color: var(--color-text);
+    }
+
+    .preview.empty {
+      color: var(--color-text-muted);
+    }
+
+    .preview.error {
+      color: var(--color-danger);
+    }
+
+    /* ── Loading spinner ── */
+    .loading-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(43, 48, 59, 0.7);
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+    }
+
+    .loading-overlay.visible {
+      display: flex;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      min-height: 16px;
+      flex-shrink: 0;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-num {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Status message ── */
+    .status {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      min-height: 16px;
+      margin-top: var(--space-sm);
+      flex-shrink: 0;
+    }
+
+    .status.success {
+      color: var(--color-success);
+    }
+
+    .status.error-msg {
+      color: var(--color-danger);
+    }
+
+    /* ── Support link ── */
+    .support-link {
+      margin-top: var(--space-sm);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .support-link a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .support-link a:hover {
+      color: var(--color-accent);
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>Heavy Documentation Extractor</h1>
-    <span class="filename" id="filename">&mdash;</span>
+    <h1>Documentation Extractor</h1>
+    <span class="filename-badge" id="filename">&mdash;</span>
   </div>
 
-  <div class="preview empty" id="preview">Select a Figma Section</div>
+  <div class="format-tabs" id="format-tabs">
+    <button class="tab active" data-format="markdown">MD</button>
+    <button class="tab" data-format="json">JSON</button>
+    <button class="tab" data-format="html">HTML</button>
+  </div>
+
+  <div class="preview-wrap">
+    <pre class="preview empty" id="preview">Select a Figma Section to extract</pre>
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="stats-bar"></div>
 
   <div class="actions">
-    <button class="btn-secondary" id="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Refresh</button>
-    <button class="btn-secondary" id="copy" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy</button>
-    <button class="btn-primary" id="download" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Download</button>
+    <button class="btn-secondary" id="refresh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      Refresh
+    </button>
+    <button class="btn-secondary" id="copy" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+      Copy
+    </button>
+    <button class="btn-primary" id="download" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      Download
+    </button>
   </div>
 
   <div class="status" id="status"></div>
@@ -40,91 +243,205 @@
 
   <script>
     const SUPPORT_URL = 'https://heavy.lemonsqueezy.com';
+
     let currentContent = '';
-    let currentFilename = 'section.md';
+    let currentFilename = '';
+    let activeFormat = 'markdown';
 
-    const preview = document.getElementById('preview');
-    const filename = document.getElementById('filename');
-    const copyBtn = document.getElementById('copy');
+    // Cache of extracted content per format so tab-switching is instant
+    const contentCache = {};
+
+    const preview     = document.getElementById('preview');
+    const filenameEl  = document.getElementById('filename');
+    const copyBtn     = document.getElementById('copy');
     const downloadBtn = document.getElementById('download');
-    const refreshBtn = document.getElementById('refresh');
-    const status = document.getElementById('status');
+    const refreshBtn  = document.getElementById('refresh');
+    const status      = document.getElementById('status');
+    const statsBar    = document.getElementById('stats-bar');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
-    // Handle messages from plugin code
+    // ── Format tabs ──────────────────────────────────────────────────────
+
+    document.getElementById('format-tabs').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-format]');
+      if (!btn) return;
+
+      const fmt = btn.dataset.format;
+      if (fmt === activeFormat) return;
+
+      activeFormat = fmt;
+
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+
+      // If we have cached content for this format, show it
+      if (contentCache[fmt]) {
+        showContent(contentCache[fmt].content, contentCache[fmt].filename, contentCache[fmt].stats);
+      } else {
+        // Request extraction in new format
+        requestExtract(fmt);
+      }
+    });
+
+    function requestExtract(fmt) {
+      showLoading();
+      parent.postMessage({ pluginMessage: { type: 'extract', format: fmt } }, '*');
+    }
+
+    // ── Loading ──────────────────────────────────────────────────────────
+
+    function showLoading() {
+      loadingOverlay.classList.add('visible');
+      copyBtn.disabled = true;
+      downloadBtn.disabled = true;
+      clearStatus();
+    }
+
+    function hideLoading() {
+      loadingOverlay.classList.remove('visible');
+    }
+
+    // ── Content display ──────────────────────────────────────────────────
+
+    function showContent(content, filename, stats) {
+      currentContent = content;
+      currentFilename = filename;
+
+      preview.textContent = content;
+      preview.className = 'preview';
+      filenameEl.textContent = filename;
+
+      copyBtn.disabled = false;
+      downloadBtn.disabled = false;
+
+      renderStats(stats);
+      hideLoading();
+    }
+
+    function showError(message) {
+      preview.textContent = message;
+      preview.className = 'preview empty';
+      filenameEl.textContent = '\u2014';
+      copyBtn.disabled = true;
+      downloadBtn.disabled = true;
+      statsBar.innerHTML = '';
+      hideLoading();
+    }
+
+    function renderStats(stats) {
+      if (!stats) { statsBar.innerHTML = ''; return; }
+
+      const parts = [];
+      if (stats.headings > 0) parts.push(stat(stats.headings, stats.headings === 1 ? 'heading' : 'headings'));
+      if (stats.textNodes > 0) parts.push(stat(stats.textNodes, stats.textNodes === 1 ? 'text node' : 'text nodes'));
+      if (stats.components > 0) parts.push(stat(stats.components, stats.components === 1 ? 'component' : 'components'));
+
+      // Word count from content
+      const words = currentContent.split(/\s+/).filter(Boolean).length;
+      if (words > 0) parts.push(stat(words, 'words'));
+
+      statsBar.innerHTML = parts.join('<span style="color:var(--color-border)">·</span>');
+    }
+
+    function stat(n, label) {
+      return `<span class="stat"><span class="stat-num">${n}</span> ${label}</span>`;
+    }
+
+    // ── Status helpers ───────────────────────────────────────────────────
+
+    let statusTimer = null;
+
+    function setStatus(msg, type = '') {
+      clearTimeout(statusTimer);
+      status.textContent = msg;
+      status.className = 'status' + (type ? ' ' + type : '');
+      if (type === 'success') {
+        statusTimer = setTimeout(() => { status.textContent = ''; status.className = 'status'; }, 2200);
+      }
+    }
+
+    function clearStatus() {
+      clearTimeout(statusTimer);
+      status.textContent = '';
+      status.className = 'status';
+    }
+
+    // ── Plugin message handler ───────────────────────────────────────────
+
     window.onmessage = (event) => {
       const msg = event.data.pluginMessage;
+      if (!msg) return;
 
-      if (msg?.type === 'markdown') {
-        currentContent = msg.content;
-        currentFilename = msg.filename;
-
-        preview.textContent = currentContent;
-        preview.classList.remove('error', 'empty');
-        filename.textContent = currentFilename;
-
-        copyBtn.disabled = false;
-        downloadBtn.disabled = false;
-        status.textContent = '';
+      if (msg.type === 'loading') {
+        showLoading();
+        return;
       }
 
-      if (msg?.type === 'error') {
-        preview.textContent = msg.message;
-        preview.classList.add('empty');
-        preview.classList.remove('error');
-        filename.textContent = '\u2014';
+      if (msg.type === 'result') {
+        contentCache[msg.format] = {
+          content: msg.content,
+          filename: msg.filename,
+          stats: msg.stats,
+        };
+        // Only display if this is the active format
+        if (msg.format === activeFormat) {
+          showContent(msg.content, msg.filename, msg.stats);
+        }
+        return;
+      }
 
-        copyBtn.disabled = true;
-        downloadBtn.disabled = true;
-        status.textContent = '';
+      if (msg.type === 'error') {
+        contentCache[activeFormat] = null;
+        showError(msg.message);
+        return;
       }
     };
 
-    // Copy to clipboard using textarea fallback (clipboard API doesn't work in Figma iframes)
+    // ── Copy ─────────────────────────────────────────────────────────────
+
     copyBtn.addEventListener('click', () => {
       const textarea = document.createElement('textarea');
       textarea.value = currentContent;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
+      textarea.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
       document.body.appendChild(textarea);
       textarea.select();
-
       try {
         document.execCommand('copy');
-        status.textContent = 'Copied to clipboard';
-        status.classList.add('success');
-        setTimeout(() => {
-          status.textContent = '';
-          status.classList.remove('success');
-        }, 2000);
-      } catch (err) {
-        status.textContent = 'Failed to copy';
+        setStatus('Copied to clipboard', 'success');
+      } catch {
+        setStatus('Failed to copy — try download instead', 'error-msg');
       }
-
       document.body.removeChild(textarea);
     });
 
-    // Download file
+    // ── Download ─────────────────────────────────────────────────────────
+
     downloadBtn.addEventListener('click', () => {
-      const blob = new Blob([currentContent], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
+      const mimeTypes = {
+        markdown: 'text/markdown',
+        json: 'application/json',
+        html: 'text/html',
+      };
+      const mime = mimeTypes[activeFormat] || 'text/plain';
+      const blob = new Blob([currentContent], { type: mime });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
       a.download = currentFilename;
       a.click();
       URL.revokeObjectURL(url);
-
-      status.textContent = 'Downloaded ' + currentFilename;
-      status.classList.add('success');
-      setTimeout(() => {
-        status.textContent = '';
-        status.classList.remove('success');
-      }, 2000);
+      setStatus('Downloaded ' + currentFilename, 'success');
     });
 
-    // Refresh
+    // ── Refresh ───────────────────────────────────────────────────────────
+
     refreshBtn.addEventListener('click', () => {
-      parent.postMessage({ pluginMessage: { type: 'extract' } }, '*');
+      // Clear cache so all formats re-extract
+      Object.keys(contentCache).forEach(k => delete contentCache[k]);
+      requestExtract(activeFormat);
     });
+
+    // ── Support link ──────────────────────────────────────────────────────
 
     document.getElementById('support-link').addEventListener('click', (e) => {
       e.preventDefault();

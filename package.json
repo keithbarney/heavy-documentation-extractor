@@ -1,6 +1,6 @@
 {
   "name": "heavy-documentation-extractor",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Extract text from Figma sections to markdown with preserved hierarchy",
   "scripts": {
     "build:ui": "node build-ui.js",
