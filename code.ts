@@ -153,7 +153,8 @@ async function extractMarkdownFromNode(node: SceneNode, depth: number): Promise<
 }
 
 // Main plugin logic
-figma.showUI(__html__, { width: 480, height: 400 });
+var UI_WIDTH = 480;
+figma.showUI(__html__, { width: UI_WIDTH, height: 400 });
 
 async function extractMarkdown() {
   var selection = figma.currentPage.selection;
@@ -202,6 +203,10 @@ async function extractMarkdown() {
 
 // Listen for UI messages
 figma.ui.onmessage = function(msg) {
+  if (msg.type === 'resize') {
+    figma.ui.resize(UI_WIDTH, msg.height);
+    return;
+  }
   if (msg.type === 'extract') {
     extractMarkdown();
   }

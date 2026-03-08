@@ -1,45 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
   <!-- HEAVY_THEME -->
   <style>
+    /* ================================================================
+       PLUGIN SHELL
+       ================================================================ */
+
+    body {
+      font-family: var(--base-font-family-secondary, monospace);
+      font-size: var(--hds-font-size-body-sm);
+      color: var(--hds-text-default);
+      background: var(--hds-bg-default);
+      padding: var(--hds-space-16);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: var(--hds-space-12);
+    }
+
+    .filename {
+      font-size: var(--hds-font-size-body-sm);
+      color: var(--hds-text-muted);
+      background: var(--hds-surface-default);
+      padding: var(--hds-space-4) var(--hds-space-8);
+      border-radius: var(--hds-radius-sm);
     }
 
     .preview {
+      flex: 1;
+      background: var(--hds-surface-default);
+      border: 1px solid var(--hds-border-default);
+      border-radius: var(--hds-radius-sm);
+      padding: var(--hds-space-12);
+      overflow-y: auto;
       font-size: 11px;
       line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
     }
+
+    .preview.empty {
+      color: var(--hds-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview.error {
+      color: var(--hds-feedback-danger);
+      background: rgba(252, 127, 121, 0.08);
+      border-color: var(--hds-feedback-danger);
+    }
+
+    .actions {
+      display: flex;
+      gap: var(--hds-space-8);
+      margin-top: var(--hds-space-12);
+    }
+
+    .actions button {
+      flex: 1;
+    }
+
+    .status {
+      text-align: center;
+      font-size: var(--hds-font-size-body-sm);
+      color: var(--hds-text-muted);
+      margin-top: var(--hds-space-8);
+    }
+
+    .status:empty {
+      display: none;
+    }
+
+    .status.success {
+      color: var(--hds-feedback-success);
+    }
+
+    .status.error {
+      color: var(--hds-feedback-danger);
+    }
+
+    .support-link {
+      text-align: center;
+      margin-top: var(--hds-space-12);
+      font-size: 10px;
+    }
+
+    .support-link a {
+      color: var(--hds-text-muted);
+      text-decoration: none;
+      transition: color 150ms ease;
+    }
+
+    .support-link a:hover {
+      color: var(--hds-text-default);
+    }
+
+    .theme-toggle {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--hds-text-muted);
+      transition: color 150ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+
+    .theme-toggle:hover {
+      color: var(--hds-text-default);
+      background: none;
+    }
+
+    .theme-toggle svg {
+      width: 12px;
+      height: 12px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>Heavy Documentation Extractor</h1>
     <span class="filename" id="filename">&mdash;</span>
   </div>
 
   <div class="preview empty" id="preview">Select a Figma Section</div>
 
   <div class="actions">
-    <button class="btn-secondary" id="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Refresh</button>
-    <button class="btn-secondary" id="copy" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy</button>
-    <button class="btn-primary" id="download" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Download</button>
+    <button class="hds-btn hds-btn--secondary" id="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Refresh</button>
+    <button class="hds-btn hds-btn--secondary" id="copy" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy</button>
+    <button class="hds-btn hds-btn--primary" id="download" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Download</button>
   </div>
 
   <div class="status" id="status"></div>
 
   <div class="support-link">
-    <a href="#" id="support-link">Support this plugin &#9829;</a>
+    <a href="#" id="feedback-link">Feedback</a> · <a href="#" id="support-link">Buy me a coffee <span style="font-size: 14px">&#9749;</span></a> · <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
   </div>
 
   <script>
-    const SUPPORT_URL = 'https://heavy.lemonsqueezy.com';
+    var FEEDBACK_URL = 'mailto:keithbarneydesign@gmail.com?subject=Heavy Documentation Extractor Feedback';
+    var SUPPORT_URL = 'https://buy.stripe.com/8x2eVfdpYfbW5Rd1Ax87K01';
     let currentContent = '';
     let currentFilename = 'section.md';
 
@@ -126,10 +238,45 @@
       parent.postMessage({ pluginMessage: { type: 'extract' } }, '*');
     });
 
+    document.getElementById('feedback-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      parent.postMessage({ pluginMessage: { type: 'open-url', url: FEEDBACK_URL } }, '*');
+    });
+
     document.getElementById('support-link').addEventListener('click', (e) => {
       e.preventDefault();
       parent.postMessage({ pluginMessage: { type: 'open-url', url: SUPPORT_URL } }, '*');
     });
+
+    // Theme toggle
+    var sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+    var moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+    var themeToggle = document.getElementById('theme-toggle');
+    try { var savedTheme = localStorage.getItem('heavy-plugin-theme'); } catch(e) { var savedTheme = null; }
+    if (savedTheme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
+      themeToggle.innerHTML = moonIcon;
+    } else {
+      themeToggle.innerHTML = sunIcon;
+    }
+    themeToggle.addEventListener('click', function() {
+      var isDark = document.documentElement.hasAttribute('data-theme');
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('heavy-plugin-theme', 'light'); } catch(e) {}
+        themeToggle.innerHTML = moonIcon;
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.removeItem('heavy-plugin-theme'); } catch(e) {}
+        themeToggle.innerHTML = sunIcon;
+      }
+    });
+
+    // Auto-resize to fit content
+    new ResizeObserver(function() {
+      var h = document.documentElement.scrollHeight;
+      parent.postMessage({ pluginMessage: { type: 'resize', height: h } }, '*');
+    }).observe(document.body);
   </script>
 </body>
 </html>

@@ -1,0 +1,240 @@
+{
+  "projectName": "heavy-documentation-extractor",
+  "createdAt": "2026-03-07",
+  "updatedAt": "2026-03-07",
+  "phases": {
+    "idea-vision": {
+      "steps": {
+        "problem-statement": {
+          "tasks": {
+            "ps-1": { "completed": true, "value": "Design documentation lives in Figma sections as visual text — extracting it to Markdown for wikis, READMEs, or handoff docs requires tedious manual copy-paste" },
+            "ps-2": { "completed": true, "value": "Design system maintainers and technical writers who document components in Figma" },
+            "ps-3": { "completed": true, "value": "Pain" },
+            "ps-4": { "completed": true, "value": "Every time documentation changes in Figma, someone manually re-copies text and reformats headings" },
+            "ps-5": { "completed": true, "value": "Daily" }
+          }
+        },
+        "vision-positioning": {
+          "tasks": {
+            "vp-1": { "completed": true, "value": "Select a section, get clean Markdown with heading hierarchy auto-detected from font sizes" },
+            "vp-2": { "completed": true, "value": "Turn Figma text sections into structured Markdown in one click" },
+            "vp-3": { "completed": true, "value": "Design system teams who maintain documentation alongside their component libraries in Figma" }
+          }
+        },
+        "competitive-landscape": {
+          "tasks": {
+            "cl-1": { "completed": true, "value": "No direct competitors — most teams manually copy text from Figma or use screenshot-based documentation" },
+            "cl-2": { "completed": true, "value": "Automatic heading hierarchy detection based on font size — largest 3 sizes map to h1, h2, h3" },
+            "cl-3": { "completed": true, "value": "Font-size-based heading detection, spatial sorting (top-to-bottom, left-to-right), copy to clipboard, download as .md" }
+          }
+        }
+      }
+    },
+    "validation": {
+      "steps": {
+        "validation-research": {
+          "tasks": {
+            "vr-1": { "completed": true, "value": "Built to solve personal pain extracting docs from Heavy Design System Figma files" },
+            "vr-2": { "completed": true, "value": "Published on Figma Community — live installs validate demand" },
+            "vr-3": { "completed": true, "value": "Positive reception from Figma Community users" }
+          }
+        },
+        "scope-definition": {
+          "tasks": {
+            "sd-1": { "completed": true, "value": "Select a section, run plugin, preview Markdown, copy or download" },
+            "sd-2": { "completed": true },
+            "sd-3": { "completed": true, "value": "Text extraction, heading hierarchy detection, Markdown preview, copy to clipboard, download as .md" },
+            "sd-4": { "completed": true, "value": "No image extraction, no table detection, no cross-section operations" }
+          }
+        }
+      }
+    },
+    "business-model": {
+      "steps": {
+        "revenue-and-costs": {
+          "tasks": {
+            "rc-1": { "completed": true, "value": "Free (no revenue)" },
+            "rc-2": { "completed": true, "value": "Free with PWYW tip jar via Stripe" },
+            "rc-3": { "completed": true, "value": "Stripe" },
+            "rc-4": { "completed": true, "value": "Zero — runs locally as Figma plugin, no hosting costs" },
+            "rc-5": { "completed": true, "value": "N/A — no revenue, no costs" }
+          }
+        },
+        "legal-compliance": {
+          "tasks": {
+            "lc-1": { "completed": false },
+            "lc-2": { "completed": false },
+            "lc-3": { "completed": false },
+            "lc-4": { "completed": false }
+          }
+        }
+      }
+    },
+    "product-definition": {
+      "steps": {
+        "user-stories": {
+          "tasks": {
+            "us-1": { "completed": true, "value": "As a design system maintainer, I want to extract all text from a Figma section as Markdown with proper heading hierarchy so I can paste it into documentation wikis" },
+            "us-2": { "completed": true }
+          }
+        },
+        "ux-flows": {
+          "tasks": {
+            "ux-1": { "completed": true, "value": "Single Figma plugin panel — no multi-screen navigation" },
+            "ux-2": { "completed": true, "value": "N/A — plugin opens ready to use, no onboarding needed" },
+            "ux-3": { "completed": true, "value": "Select section, run plugin, preview Markdown, copy or download" },
+            "ux-4": { "completed": true, "value": "Error message if no section is selected" },
+            "ux-5": { "completed": false }
+          }
+        }
+      }
+    },
+    "design": {
+      "steps": {
+        "visual-design": {
+          "tasks": {
+            "vd-1": { "completed": true, "value": "Existing design system" },
+            "vd-2": { "completed": true, "value": "HDS (Heavy Design System) — dark theme, --hds-* tokens" },
+            "vd-3": { "completed": true, "value": "N/A — uses HDS components" },
+            "vd-4": { "completed": true },
+            "vd-5": { "completed": true }
+          }
+        }
+      }
+    },
+    "technical-architecture": {
+      "steps": {
+        "stack-and-infrastructure": {
+          "tasks": {
+            "si-1": { "completed": true, "value": "Figma Plugin API + TypeScript + esbuild. UI via build-ui.js (inlines HDS CSS). No framework." },
+            "si-2": { "completed": true, "value": "Plain CSS" },
+            "si-3": { "completed": true, "value": "Other" },
+            "si-4": { "completed": true, "value": "None — Figma plugins run in browser sandbox" },
+            "si-5": { "completed": true, "value": "Figma Plugin API for canvas manipulation, esbuild for bundling code.ts, build-ui.js for inlining HDS CSS into ui.html. No external dependencies needed." }
+          }
+        },
+        "data-architecture": {
+          "tasks": {
+            "da-1": { "completed": true, "value": "Reads text nodes from selected Figma section, sorts by position, maps font sizes to heading levels, outputs Markdown" },
+            "da-2": { "completed": true, "value": "Other" },
+            "da-3": { "completed": true, "value": "Figma Plugin API — postMessage between sandbox (code.ts) and UI (ui.html)" },
+            "da-4": { "completed": true, "value": "N/A — no persistent data storage, operates on Figma document state" }
+          }
+        },
+        "auth-authorization": {
+          "tasks": {
+            "aa-1": { "completed": true, "value": "No — public/local only" },
+            "aa-2": { "completed": true, "value": "N/A — Figma handles auth" },
+            "aa-3": { "completed": true, "value": "N/A — single user" }
+          }
+        }
+      }
+    },
+    "development": {
+      "steps": {
+        "project-setup": {
+          "tasks": {
+            "ps-setup-1": { "completed": true },
+            "ps-setup-2": { "completed": true },
+            "ps-setup-3": { "completed": true },
+            "ps-setup-4": { "completed": true },
+            "ps-setup-5": { "completed": true }
+          }
+        },
+        "core-features": {
+          "tasks": {
+            "cf-1": { "completed": true },
+            "cf-2": { "completed": true },
+            "cf-3": { "completed": true },
+            "cf-4": { "completed": true },
+            "cf-5": { "completed": true }
+          }
+        },
+        "polish-edge-cases": {
+          "tasks": {
+            "pe-1": { "completed": true },
+            "pe-2": { "completed": true },
+            "pe-3": { "completed": true },
+            "pe-4": { "completed": true },
+            "pe-5": { "completed": false }
+          }
+        }
+      }
+    },
+    "testing-qa": {
+      "steps": {
+        "testing": {
+          "tasks": {
+            "t-1": { "completed": true },
+            "t-2": { "completed": true },
+            "t-3": { "completed": false },
+            "t-4": { "completed": true },
+            "t-5": { "completed": true },
+            "t-6": { "completed": false }
+          }
+        }
+      }
+    },
+    "launch-prep": {
+      "steps": {
+        "content-and-seo": {
+          "tasks": {
+            "cs-1": { "completed": true, "value": "Heavy Documentation Extractor — extract Figma text sections to Markdown" },
+            "cs-2": { "completed": false },
+            "cs-3": { "completed": true, "value": "Figma Community plugin listing with icon and screenshots" },
+            "cs-4": { "completed": true },
+            "cs-5": { "completed": true, "value": "None yet" }
+          }
+        },
+        "pre-launch-checklist": {
+          "tasks": {
+            "plc-1": { "completed": true },
+            "plc-2": { "completed": true },
+            "plc-3": { "completed": true },
+            "plc-4": { "completed": false },
+            "plc-5": { "completed": false }
+          }
+        }
+      }
+    },
+    "marketing": {
+      "steps": {
+        "launch-marketing": {
+          "tasks": {
+            "lm-1": { "completed": false },
+            "lm-2": { "completed": false },
+            "lm-3": { "completed": false },
+            "lm-4": { "completed": false },
+            "lm-5": { "completed": false }
+          }
+        }
+      }
+    },
+    "launch": {
+      "steps": {
+        "ship-and-monitor": {
+          "tasks": {
+            "sm-1": { "completed": true },
+            "sm-2": { "completed": true },
+            "sm-3": { "completed": false },
+            "sm-4": { "completed": false },
+            "sm-5": { "completed": false }
+          }
+        }
+      }
+    },
+    "post-launch": {
+      "steps": {
+        "feedback-and-iteration": {
+          "tasks": {
+            "fi-1": { "completed": false },
+            "fi-2": { "completed": false },
+            "fi-3": { "completed": false },
+            "fi-4": { "completed": false },
+            "fi-5": { "completed": false }
+          }
+        }
+      }
+    }
+  }
+}
